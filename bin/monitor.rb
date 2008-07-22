@@ -1,40 +1,13 @@
-#!/usr/bin/ruby
-class Tomcat
+#!/usr/bin/env ruby
+require File.join(File.dirname(__FILE__), '../lib/tomcat')
 
-  def initialize(pidfile)
-    @pidfile=pidfile
+tomcat = Tomcat.new()
+if tomcat.valid?
+  loop do
+    puts "check if tomcat is running"
+    tomcat.start unless tomcat.running?
+    sleep(30)
   end
-  
-  def running?
-    begin
-      Process.getpgid(pid)!= -1
-    rescue Errno::ESRCH, Errno::ENOENT
-      false
-    end
-  end
-
-  def pid
-    File.open(@pidfile) do |f|
-      f.gets.to_i
-    end
-  end
-  
-  def start
-    puts "Starting tomcat"
-    `./startup.sh`
-  end
-
-end
-
-@pidfile=ENV["CATALINA_PID"]
-if @pidfile.nil? 
-  puts "CATALINA_PID environment variable not set."
-  exit
-end
-
-tomcat = Tomcat.new(@pidfile)
-loop do
-  puts "checking"
-  tomcat.start unless tomcat.running?
-  sleep(30)
+else
+  tomcat.errors.each {|e| puts e}
 end
