@@ -24,6 +24,8 @@ class Tomcat
 
   def start
     puts "Starting tomcat"
+    timestamp = Time.now.strftime("%Y%M%d%H%M%S")
+    `mv #{@home}/logs/catalina.out #{@home}/logs/catalina_#{timestamp}.out`
     `cd #{@home}/bin;./catalina.sh start`
   end
 
